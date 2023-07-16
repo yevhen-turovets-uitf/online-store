@@ -1,0 +1,15 @@
+export const productMapper = product => ({
+    id: product.id,
+    title: product.title,
+    picture: product.picture,
+    price: product.price,
+    currency: product.currency,
+    discountPrice: product.discountPrice,
+    quantity: product.qty,
+    slug: product.slug,
+    variants: product.variants,
+    variant: '',
+    oldPrice: product.price,
+    oldDscPrice: product.discountPrice,
+    oldQuantity: product.qty,
+});

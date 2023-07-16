@@ -1,0 +1,1661 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "My API",
+        "version": "0.1"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000/api/v1",
+            "description": "Demo API Server"
+        }
+    ],
+    "paths": {
+        "/auth/forgot-password": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Send Reset Link",
+                "description": "Send reset link on email",
+                "operationId": "authSent",
+                "requestBody": {
+                    "description": "Pass user credentials",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "test@example.com"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "We have emailed your password reset link!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Link not sent",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Email could not be sent to this email address."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Sign in",
+                "description": "Login by email, password",
+                "operationId": "authLogin",
+                "requestBody": {
+                    "description": "Pass user credentials",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "test@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "Password1"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthUserResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Wrong credentials response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Email or password invalid."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logout",
+                "description": "Logout user and invalidate token",
+                "operationId": "authLogout",
+                "responses": {
+                    "204": {
+                        "description": "Success"
+                    },
+                    "401": {
+                        "description": "Returns when user is not authenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "The user is not authorized. Log in to perform the action."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/refresh": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Refresh",
+                "description": "refresh auth token",
+                "operationId": "authRefresh",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthUserResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/reset-password": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Reset password",
+                "description": "Reset user's password",
+                "operationId": "passwordReset",
+                "requestBody": {
+                    "description": "Pass user credentials",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "token",
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "token": {
+                                        "description": "Password reset token",
+                                        "type": "string",
+                                        "example": "6fc3e2c8536ba926235d427ac0d729b59d82fc9d091037640d476189217097d7"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "test@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "NewPassword2"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "NewPassword2"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Your password has been reset!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid password reset token",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": [
+                                                        "This password reset token is invalid.",
+                                                        "Please wait before retrying."
+                                                    ]
+                                                },
+                                                "code": {
+                                                    "type": "string",
+                                                    "example": "400"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/products/{product}/variants": {
+            "get": {
+                "tags": [
+                    "Variants"
+                ],
+                "summary": "Get list product variant by product id",
+                "description": "Return product variant list for product",
+                "operationId": "getVariantListByProductId",
+                "parameters": [
+                    {
+                        "name": "product",
+                        "in": "path",
+                        "description": "Product id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": "1"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ProductVariantResponse"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Product Not Found"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Variants"
+                ],
+                "summary": "Store new product variant for product",
+                "description": "Return new product variant for product",
+                "operationId": "storeProductVariantForProduct",
+                "parameters": [
+                    {
+                        "name": "product",
+                        "in": "path",
+                        "description": "Product id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": "1"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreProductVariantRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProductVariantResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Product Not Found"
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    }
+                }
+            }
+        },
+        "/variants/{variant}": {
+            "get": {
+                "tags": [
+                    "Variants"
+                ],
+                "summary": "Get product variant information",
+                "description": "Get product variant information by id",
+                "operationId": "getProductVariantByID",
+                "parameters": [
+                    {
+                        "name": "variant",
+                        "in": "path",
+                        "description": "Product variant id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": "1"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProductVariantResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Variants"
+                ],
+                "summary": "Update existing product variant",
+                "description": "Returns updated product variant data",
+                "operationId": "updateProductVariant",
+                "parameters": [
+                    {
+                        "name": "variant",
+                        "in": "path",
+                        "description": "Product variant id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": "1"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateProductVariantRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProductVariantResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Variants"
+                ],
+                "summary": "Delete existing product variant",
+                "description": "Deletes a record and returns no content",
+                "operationId": "deleteProductVariant",
+                "parameters": [
+                    {
+                        "name": "variant",
+                        "in": "path",
+                        "description": "Product variant id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": "1"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    }
+                }
+            }
+        },
+        "/products": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Get list of products",
+                "description": "Return list of products",
+                "operationId": "getProductsList",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ProductResponse"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Store new product",
+                "description": "Returns new product data",
+                "operationId": "storeProduct",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreProductRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProductResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/products/{product}": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Get product information",
+                "description": "Get product information by id",
+                "operationId": "getProductByID",
+                "parameters": [
+                    {
+                        "name": "product",
+                        "in": "path",
+                        "description": "Product id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": "1"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProductResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Update existing product",
+                "description": "Returns updated product data",
+                "operationId": "updateProduct",
+                "parameters": [
+                    {
+                        "name": "product",
+                        "in": "path",
+                        "description": "Product id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": "1"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateProductRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProductResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Delete existing product",
+                "description": "Deletes a record and returns no content",
+                "operationId": "deleteProduct",
+                "parameters": [
+                    {
+                        "name": "product",
+                        "in": "path",
+                        "description": "Product id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": "1"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    }
+                }
+            }
+        },
+        "/products/{product}/picture": {
+            "post": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Upload product picture",
+                "description": "Returns updated product data",
+                "operationId": "uploadProductPicture",
+                "parameters": [
+                    {
+                        "name": "product",
+                        "in": "path",
+                        "description": "Product id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": "1"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UploadProductPictureRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProductResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "422": {
+                        "description": "Resource Not Found"
+                    }
+                }
+            }
+        },
+        "/auth/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Sing up",
+                "description": "Register new user",
+                "operationId": "registerUser",
+                "requestBody": {
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthUserResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
+        "/user": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Get Auth User",
+                "description": "Return authorized user data",
+                "operationId": "getAuthUser",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Returns when user is not authenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "The user is not authorized. Log in to perform the action."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/sizes": {
+            "get": {
+                "tags": [
+                    "Sizes"
+                ],
+                "summary": "Get list of sizes",
+                "description": "Return list of sizes",
+                "operationId": "getSizesList",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/VariantSizeResponse"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Sizes"
+                ],
+                "summary": "Store new size",
+                "description": "Returns new size data",
+                "operationId": "storeSize",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "description": "Unique size name",
+                                        "type": "string",
+                                        "example": "XXS"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VariantSizeResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The name has already been taken."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "name": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "example": [
+                                                            "The name field is required.",
+                                                            "The name has already been taken."
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/sizes/{size}": {
+            "get": {
+                "tags": [
+                    "Sizes"
+                ],
+                "summary": "Get size information",
+                "description": "Get size information by id",
+                "operationId": "getSizeByID",
+                "parameters": [
+                    {
+                        "name": "size",
+                        "in": "path",
+                        "description": "Size id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": "1"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VariantSizeResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Sizes"
+                ],
+                "summary": "Update existing size",
+                "description": "Returns updated size data",
+                "operationId": "UpdateSize",
+                "parameters": [
+                    {
+                        "name": "size",
+                        "in": "path",
+                        "description": "Size id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": "1"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "description": "Unique size name",
+                                        "type": "string",
+                                        "example": "XXS"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VariantSizeResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The name has already been taken."
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "name": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "example": [
+                                                            "The name field is required.",
+                                                            "The name has already been taken."
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Sizes"
+                ],
+                "summary": "Delete existing size",
+                "description": "Deletes a record and returns no content",
+                "operationId": "deleteSize",
+                "parameters": [
+                    {
+                        "name": "size",
+                        "in": "path",
+                        "description": "Size id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": "1"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "AuthUserResponse": {
+                "description": "Returns auth user array response",
+                "properties": {
+                    "user": {
+                        "$ref": "#/components/schemas/UserResponse"
+                    },
+                    "token": {
+                        "description": "Access token",
+                        "type": "string",
+                        "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAvYXBpL3YxL2F1dGgvbG9naW4iLCJpYXQiOjE2NzA2ODQ3NTEsImV4cCI6MTY3MzI3Njc1MSwibmJmIjoxNjcwNjg0NzUxLCJqdGkiOiJtZ1pUMmh0MVlESHEzdTZ0Iiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.YKQpm0Ykhx1xvkAsYnGLnkjN8LJ0KTEsfs37dtHMrmM"
+                    },
+                    "type": {
+                        "description": "Type of access token",
+                        "type": "string",
+                        "example": "brearer"
+                    },
+                    "time": {
+                        "description": "expired in X of seconds",
+                        "type": "integer",
+                        "format": "int64",
+                        "example": "2592000"
+                    }
+                },
+                "type": "object"
+            },
+            "ProductResponse": {
+                "description": "Product array response",
+                "required": [
+                    "title",
+                    "price"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Unique product title",
+                        "type": "integer",
+                        "format": "int64",
+                        "example": "4"
+                    },
+                    "title": {
+                        "description": "Unique product title",
+                        "type": "string",
+                        "example": "T-shirt"
+                    },
+                    "slug": {
+                        "description": "Unique slug from product title",
+                        "type": "string",
+                        "example": "t-shirt12"
+                    },
+                    "picture": {
+                        "description": "Product pictrue url",
+                        "type": "string",
+                        "example": "https://via.placeholder.com/640x480.png/0022ff?text=dolorem",
+                        "nullable": "true"
+                    },
+                    "price": {
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": "1",
+                        "example": "300"
+                    },
+                    "discountPrice": {
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": "0",
+                        "example": "0"
+                    },
+                    "currency": {
+                        "description": "Currency of price one of USD or EUR",
+                        "type": "string",
+                        "example": "USD"
+                    },
+                    "qty": {
+                        "description": "Quantity product on storage",
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": "0",
+                        "example": "10"
+                    },
+                    "variants": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProductVariantResponse"
+                        }
+                    }
+                },
+                "type": "object",
+                "xml": {
+                    "name": "ProductArrayPresenter"
+                }
+            },
+            "ProductVariantResponse": {
+                "description": "Product variant array response",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": "2"
+                    },
+                    "title": {
+                        "description": "Unique product variant title",
+                        "type": "string",
+                        "example": "T-shirt S"
+                    },
+                    "slug": {
+                        "description": "Unique slug from product variant title",
+                        "type": "string",
+                        "example": "t-shirt-s2"
+                    },
+                    "price": {
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": "1",
+                        "example": "300"
+                    },
+                    "discountPrice": {
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": "0",
+                        "example": "0"
+                    },
+                    "currency": {
+                        "description": "Currency of price one of USD or EUR",
+                        "type": "string",
+                        "example": "USD"
+                    },
+                    "qty": {
+                        "description": "Quantity product variant on storage",
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": "0",
+                        "example": "10"
+                    },
+                    "size": {
+                        "$ref": "#/components/schemas/VariantSizeResponse"
+                    },
+                    "productId": {
+                        "description": "Product's id of the product variant",
+                        "type": "integer",
+                        "format": "int64",
+                        "example": "1"
+                    },
+                    "sizeId": {
+                        "description": "Size's id of the product variant",
+                        "type": "integer",
+                        "format": "int64",
+                        "example": "2"
+                    }
+                },
+                "type": "object",
+                "xml": {
+                    "name": "ProductVariantArrayPresenter"
+                }
+            },
+            "UserResponse": {
+                "description": "Returns user array response",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": "1"
+                    },
+                    "name": {
+                        "description": "User name",
+                        "type": "string",
+                        "example": "Jacob"
+                    },
+                    "email": {
+                        "description": "User email",
+                        "type": "string",
+                        "format": "email",
+                        "example": "test@example.com"
+                    }
+                },
+                "type": "object"
+            },
+            "VariantSizeResponse": {
+                "description": "Size array response",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": "2"
+                    },
+                    "name": {
+                        "description": "Size name",
+                        "type": "string",
+                        "example": "S"
+                    }
+                },
+                "type": "object"
+            },
+            "StoreProductVariantRequest": {
+                "description": "Store Product variant for product request body data",
+                "required": [
+                    "title",
+                    "price",
+                    "size"
+                ],
+                "properties": {
+                    "title": {
+                        "description": "Unique product variant title",
+                        "type": "string",
+                        "example": "T-shirt"
+                    },
+                    "price": {
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": "1",
+                        "example": "300"
+                    },
+                    "discountPrice": {
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": "0",
+                        "example": "0"
+                    },
+                    "currency": {
+                        "description": "Price currency one of USD or EUR",
+                        "type": "string",
+                        "example": "USD"
+                    },
+                    "qty": {
+                        "description": "Quantity product on storage",
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": "0",
+                        "example": "10"
+                    },
+                    "size": {
+                        "description": "Size id",
+                        "type": "integer",
+                        "format": "int64",
+                        "example": "2"
+                    }
+                },
+                "type": "object",
+                "xml": {
+                    "name": "StoreProductVariantRequest"
+                }
+            },
+            "UpdateProductVariantRequest": {
+                "description": "Update Product variant request body data",
+                "required": [
+                    "title",
+                    "price",
+                    "size"
+                ],
+                "properties": {
+                    "title": {
+                        "description": "Unique product variant title",
+                        "type": "string",
+                        "example": "pants"
+                    },
+                    "price": {
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": "1",
+                        "example": "200"
+                    },
+                    "discountPrice": {
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": "0",
+                        "example": "0"
+                    },
+                    "currency": {
+                        "description": "Price currency one of USD or EUR",
+                        "type": "string",
+                        "example": "USD"
+                    },
+                    "qty": {
+                        "description": "Quantity product on storage",
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": "0",
+                        "example": "15"
+                    },
+                    "size": {
+                        "description": "Size id",
+                        "type": "integer",
+                        "format": "int64",
+                        "example": "2"
+                    }
+                },
+                "type": "object",
+                "xml": {
+                    "name": "UpdateProductVariantRequest"
+                }
+            },
+            "StoreProductRequest": {
+                "description": "Store Product request body data",
+                "required": [
+                    "title",
+                    "price"
+                ],
+                "properties": {
+                    "title": {
+                        "description": "Unique product title",
+                        "type": "string",
+                        "example": "T-shirt"
+                    },
+                    "price": {
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": "1",
+                        "example": "300"
+                    },
+                    "discountPrice": {
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": "0",
+                        "example": "0"
+                    },
+                    "currency": {
+                        "description": "Price currency one of USD or EUR",
+                        "type": "string",
+                        "example": "USD"
+                    },
+                    "qty": {
+                        "description": "Quantity product on storage",
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": "0",
+                        "example": "10"
+                    }
+                },
+                "type": "object",
+                "xml": {
+                    "name": "StoreProductRequest"
+                }
+            },
+            "UpdateProductRequest": {
+                "description": "Update Product request body data",
+                "required": [
+                    "title",
+                    "price"
+                ],
+                "properties": {
+                    "title": {
+                        "description": "Unique product title",
+                        "type": "string",
+                        "example": "pants"
+                    },
+                    "price": {
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": "1",
+                        "example": "200"
+                    },
+                    "discountPrice": {
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": "0",
+                        "example": "0"
+                    },
+                    "currency": {
+                        "description": "Price currency one of USD or EUR",
+                        "type": "string",
+                        "example": "USD"
+                    },
+                    "qty": {
+                        "description": "Quantity product on storage",
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": "0",
+                        "example": "15"
+                    }
+                },
+                "type": "object",
+                "xml": {
+                    "name": "UpdateProductRequest"
+                }
+            },
+            "UploadProductPictureRequest": {
+                "description": "Upload or update product picture request body data",
+                "required": [
+                    "image"
+                ],
+                "properties": {
+                    "image": {
+                        "description": "Image file",
+                        "type": "string",
+                        "format": "base64",
+                        "example": "data:image/jpeg;base64, yourSuperLongStringBinary"
+                    }
+                },
+                "type": "object",
+                "xml": {
+                    "name": "UploadProductPictureRequest"
+                }
+            },
+            "BaseModel": {
+                "properties": {
+                    "created_at": {
+                        "description": "Initial creation timestamp",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": "true"
+                    },
+                    "updated_at": {
+                        "description": "Last update timestamp",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": "true"
+                    },
+                    "deleted_at": {
+                        "description": "Soft delete timestamp",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": "true"
+                    }
+                },
+                "type": "object"
+            },
+            "Product": {
+                "required": [
+                    "title",
+                    "password"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": "true",
+                        "example": "1"
+                    },
+                    "title": {
+                        "type": "string",
+                        "example": "T-shirt"
+                    },
+                    "slug": {
+                        "description": "Unique slug from product title",
+                        "type": "string",
+                        "example": "t-shirt12"
+                    },
+                    "picture": {
+                        "description": "Product pictrue url",
+                        "type": "string",
+                        "example": "https://via.placeholder.com/640x480.png/0022ff?text=dolorem",
+                        "nullable": "true"
+                    },
+                    "price": {
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": "1",
+                        "example": "300"
+                    },
+                    "discount_price": {
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": "0",
+                        "example": "0"
+                    },
+                    "currency": {
+                        "description": "Price currency one of USD or EUR",
+                        "type": "string",
+                        "example": "USD"
+                    },
+                    "qty": {
+                        "description": "Quantity product on storage",
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": "0",
+                        "example": "10"
+                    },
+                    "created_at": {
+                        "$ref": "#/components/schemas/BaseModel/properties/created_at"
+                    },
+                    "updated_at": {
+                        "$ref": "#/components/schemas/BaseModel/properties/updated_at"
+                    }
+                },
+                "type": "object",
+                "xml": {
+                    "name": "Product"
+                }
+            },
+            "ProductVariant": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": "true",
+                        "example": "1"
+                    },
+                    "title": {
+                        "type": "string",
+                        "example": "T-shirt"
+                    },
+                    "slug": {
+                        "description": "Unique slug from product variant title",
+                        "type": "string",
+                        "example": "t-shirt12"
+                    },
+                    "price": {
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": "1",
+                        "example": "300"
+                    },
+                    "discount_price": {
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": "0",
+                        "example": "0"
+                    },
+                    "currency": {
+                        "description": "Price currency one of USD or EUR",
+                        "type": "string",
+                        "example": "USD"
+                    },
+                    "qty": {
+                        "description": "Quantity product on storage",
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": "0",
+                        "example": "10"
+                    },
+                    "product_id": {
+                        "description": "Product's id of the product variant",
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": "0",
+                        "example": "1"
+                    },
+                    "size_id": {
+                        "description": "Size's id of the product variant",
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": "0",
+                        "example": "1"
+                    },
+                    "created_at": {
+                        "$ref": "#/components/schemas/BaseModel/properties/created_at"
+                    },
+                    "updated_at": {
+                        "$ref": "#/components/schemas/BaseModel/properties/updated_at"
+                    }
+                },
+                "type": "object",
+                "xml": {
+                    "name": "ProductVariant"
+                }
+            },
+            "User": {
+                "required": [
+                    "password"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": "true",
+                        "example": "1"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "John"
+                    },
+                    "email": {
+                        "description": "User unique email address",
+                        "type": "string",
+                        "format": "email",
+                        "readOnly": "true",
+                        "example": "test@example.com"
+                    },
+                    "password": {
+                        "type": "string",
+                        "format": "password",
+                        "writeOnly": "true",
+                        "example": "MyPassword1"
+                    },
+                    "email_verified_at": {
+                        "description": "Datetime marker of verification status",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": "true",
+                        "example": "2019-02-25 12:59:20"
+                    },
+                    "created_at": {
+                        "$ref": "#/components/schemas/BaseModel/properties/created_at"
+                    },
+                    "updated_at": {
+                        "$ref": "#/components/schemas/BaseModel/properties/updated_at"
+                    }
+                },
+                "type": "object",
+                "xml": {
+                    "name": "User"
+                }
+            },
+            "VariantSize": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": "true",
+                        "example": "1"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "XL"
+                    }
+                },
+                "type": "object",
+                "xml": {
+                    "name": "VariantSize"
+                }
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Passport security.",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            },
+            "bearer": {
+                "type": "http",
+                "description": "Enter token in format (Bearer <token>)",
+                "name": "Authorization",
+                "in": "header",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        }
+    }
+}
